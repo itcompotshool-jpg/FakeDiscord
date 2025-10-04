@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html>
+<head>
+            <style>* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #36393f;
+    color: #dcddde;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #36393f;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.discord-logo {
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    color: #72767d;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Main App Layout */
+.discord-app {
+    display: flex;
+    height: 100vh;
+}
+
+/* Servers Sidebar */
+.servers-sidebar {
+    width: 72px;
+    background-color: #202225;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    overflow-y: auto;
+}
+
+.server-item {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #36393f;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-radius 0.2s, background-color 0.2s;
+    position: relative;
+}
+
+.server-item:hover {
+    border-radius: 16px;
+    background-color: #5865f2;
+}
+
+.server-item.active {
+    border-radius: 16px;
+    background-color: #5865f2;
+}
+
+.server-item.active::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 40px;
+    background-color: white;
+    border-radius: 0 4px 4px 0;
+}
+
+.server-icon {
+    color: white;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.friends-icon {
+    color: #3ba55c;
+}
+
+.nitro-icon {
+    color: #ff73fa;
+}
+
+.server-divider {
+    width: 32px;
+    height: 2px;
+    background-color: #36393f;
+    margin: 8px 0;
+}
+
+.add-server {
+    background-color: #36393f;
+    color: #3ba55c;
+}
+
+.add-server:hover {
+    background-color: #3ba55c;
+    color: white;
+}
+
+/* Channels Sidebar */
+.channels-sidebar {
+    width: 240px;
+    background-color: #2f3136;
+    display: flex;
+    flex-direction: column;
+}
+
+.server-header {
+    height: 48px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.server-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+}
+
+.server-header i {
+    color: #8e9297;
+}
+
+.channels-list {
+    flex: 1;
+    padding: 8px 0;
+    overflow-y: auto;
+}
+
+.channel-category {
+    margin-bottom: 16px;
+}
+
+.category-header {
+    padding: 0 16px 8px;
+    display: flex;
+    align-items: center;
+    color: #8e9297;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.category-header i {
+    margin-right: 4px;
+    font-size: 10px;
+}
+
+.channel {
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    color: #8e9297;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.channel:hover {
+    background-color: rgba(79, 84, 92, 0.32);
+    color: #dcddde;
+}
+
+.channel.active {
+    background-color: rgba(79, 84, 92, 0.32);
+    color: white;
+}
+
+.channel i {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+.voice-channel i {
+    color: #8e9297;
+}
+
+.user-panel {
+    height: 52px;
+    background-color: #292b2f;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+    overflow: hidden;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+}
+
+.user-status {
+    font-size: 12px;
+    color: #b9bbbe;
+}
+
+.user-controls {
+    display: flex;
+}
+
+.control-btn {
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: #b9bbbe;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.control-btn:hover {
+    color: #dcddde;
+}
+
+/* Chat Area */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #36393f;
+}
+
+.chat-header {
+    height: 48px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.channel-info {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.channel-info i {
+    color: #8e9297;
+    margin-right: 8px;
+}
+
+.channel-info span {
+    color: white;
+    font-weight: 600;
+}
+
+.channel-topic {
+    color: #8e9297;
+    font-size: 14px;
+    flex: 1;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+}
+
+.header-btn {
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: #b9bbbe;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: color 0.2s;
+}
+
+.header-btn:hover {
+    color: #dcddde;
+}
+
+.search-box {
+    margin-left: 16px;
+}
+
+.search-box input {
+    background-color: #202225;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #dcddde;
+    width: 144px;
+    font-size: 14px;
+}
+
+.search-box input::placeholder {
+    color: #72767d;
+}
+
+.messages-container {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.welcome-message {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(79, 84, 92, 0.48);
+}
+
+.welcome-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #36393f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #72767d;
+    margin-right: 16px;
+}
+
+.welcome-text h3 {
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.welcome-text p {
+    color: #b9bbbe;
+    font-size: 16px;
+}
+
+.message {
+    display: flex;
+    padding: 4px 16px;
+    margin-bottom: 4px;
+    transition: background-color 0.1s;
+}
+
+.message:hover {
+    background-color: rgba(4, 4, 5, 0.07);
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.message-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.message-content {
+    flex: 1;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.message-author {
+    color: white;
+    font-weight: 500;
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.message-time {
+    color: #72767d;
+    font-size: 12px;
+}
+
+.message-text {
+    color: #dcddde;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.typing-indicator {
+    display: flex;
+    padding: 4px 16px;
+    margin-bottom: 4px;
+}
+
+.typing-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.typing-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.typing-content {
+    flex: 1;
+}
+
+.typing-text {
+    color: #72767d;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.typing-user {
+    color: white;
+    font-weight: 500;
+}
+
+.typing-dots {
+    display: flex;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: #72767d;
+    border-radius: 50%;
+    margin-right: 4px;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.message-input-container {
+    padding: 0 16px 24px;
+}
+
+.message-input-wrapper {
+    background-color: #40444b;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+}
+
+.input-controls {
+    display: flex;
+    align-items: center;
+}
+
+.input-btn {
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: #b9bbbe;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    transition: color 0.2s;
+}
+
+.input-btn:hover {
+    color: #dcddde;
+}
+
+#message-input {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 16px 0;
+    color: #dcddde;
+    font-size: 16px;
+    outline: none;
+}
+
+#message-input::placeholder {
+    color: #72767d;
+}
+
+.input-actions {
+    display: flex;
+    align-items: center;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: #b9bbbe;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: color 0.2s;
+}
+
+.action-btn:hover {
+    color: #dcddde;
+}
+
+/* Members Sidebar */
+.members-sidebar {
+    width: 240px;
+    background-color: #2f3136;
+    padding: 16px 8px;
+    overflow-y: auto;
+}
+
+.members-header {
+    color: #8e9297;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding: 0 8px;
+}
+
+.members-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.member {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.member:hover {
+    background-color: rgba(79, 84, 92, 0.32);
+}
+
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.member-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #2f3136;
+}
+
+.member.online .member-avatar::after {
+    background-color: #3ba55c;
+}
+
+.member.idle .member-avatar::after {
+    background-color: #faa81a;
+}
+
+.member.offline .member-avatar::after {
+    background-color: #747f8d;
+}
+
+.member-name {
+    color: #8e9297;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.member.online .member-name {
+    color: white;
+}
+
+/* Modals */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #36393f;
+    border-radius: 8px;
+    width: 440px;
+    max-width: 90vw;
+    box-shadow: 0 0 0 1px rgba(32, 34, 37, 0.6), 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h3 {
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    color: #b9bbbe;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: white;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.modal-body p {
+    color: #b9bbbe;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.server-upload {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.upload-area {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #2f3136;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.upload-area:hover {
+    background-color: rgba(79, 84, 92, 0.32);
+}
+
+.upload-area i {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.upload-area span {
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #b9bbbe;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    background-color: #303339;
+    border: 1px solid #222428;
+    border-radius: 3px;
+    padding: 10px;
+    color: #dcddde;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #00b0f4;
+}
+
+.modal-footer {
+    padding: 16px;
+    background-color: #2f3136;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(79, 84, 92, 0.32);
+}
+
+.btn-primary {
+    background-color: #5865f2;
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #4752c4;
+}
+
+/* User Switcher Modal */
+.user-modal {
+    width: 360px;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-option {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.user-option:hover {
+    background-color: rgba(79, 84, 92, 0.32);
+}
+
+.user-option .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 12px;
+    overflow: hidden;
+}
+
+.user-option .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info .username {
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.user-info .user-status {
+    color: #b9bbbe;
+    font-size: 12px;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2e3338;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #202225;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #1a1c20;
+}</style>
+        </head>
+        <body>
+            
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen hidden">
+        <div class="discord-logo">
+            <svg width="200" height="200" viewBox="0 0 244 240">
+                <path fill="#5865F2" d="M104.4 103.9c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1.1-6.1-4.5-11.1-10.2-11.1zm36.5 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1s-4.5-11.1-10.2-11.1z"></path>
+                <path fill="#5865F2" d="M189.5 20h-134C44.2 20 35 29.2 35 40.6v135.2c0 11.4 9.2 20.6 20.5 20.6h113.4l-5.3-18.5 12.8 11.9 12.1 11.2 21.5 19V40.6c0-11.4-9.2-20.6-20.5-20.6zm-38.6 130.6s-3.6-4.3-6.6-8.1c13.1-3.7 18.1-11.9 18.1-11.9-4.1 2.7-8 4.6-11.5 5.9-5 2.1-9.8 3.5-14.5 4.3-9.6 1.8-18.4 1.3-25.9-.1-5.7-1.1-10.6-2.7-14.7-4.3-2.3-.9-4.8-2-7.3-3.4-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.8 8 17.5 11.8c-3 3.8-6.7 8.3-6.7 8.3-22.1-.7-30.5-15.2-30.5-15.2 0-32.2 14.4-58.3 14.4-58.3 14.4-10.8 28.1-10.5 28.1-10.5l1 1.2c-18 5.2-26.3 13.1-26.3 13.1s2.2-1.2 5.9-2.9c10.7-4.7 19.2-6 22.7-6.3.6-.1 1.1-.2 1.7-.2 6.1-.8 13-1 20.2-.2 9.5 1.1 19.7 3.9 30.1 9.6 0 0-7.9-7.5-24.9-12.7l1.4-1.6s13.7-.3 28.1 10.5c0 0 14.4 26.1 14.4 58.3 0 0-8.5 14.5-30.6 15.2z"></path>
+            </svg>
+        </div>
+        <div class="loading-text">Запуск Discord</div>
+    </div>
+
+    <!-- Main App -->
+    <div id="discord-app" class="discord-app">
+        <!-- Servers Sidebar -->
+        <div class="servers-sidebar">
+            <div class="server-item active" data-server="home">
+                <div class="server-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+            </div>
+            <div class="server-divider"></div>
+            <div class="server-item" data-server="friends">
+                <div class="server-icon friends-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+            </div>
+            <div class="server-item" data-server="nitro">
+                <div class="server-icon nitro-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+            <div class="server-divider"></div>
+            <div class="server-item" data-server="server1">
+                <div class="server-icon">S1</div>
+            </div>
+            <div class="server-item" data-server="server2">
+                <div class="server-icon">S2</div>
+            </div>
+            <div class="server-item" data-server="server3">
+                <div class="server-icon">S3</div>
+            </div>
+            <div class="server-item add-server">
+                <div class="server-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Channels Sidebar -->
+        <div class="channels-sidebar">
+            <div class="server-header">
+                <h3>Сервер 1</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            
+            <div class="channels-list">
+                <div class="channel-category">
+                    <div class="category-header">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>ТЕКСТОВЫЕ КАНАЛЫ</span>
+                    </div>
+                    <div class="channel active" data-channel="general">
+                        <i class="fas fa-hashtag"></i>
+                        <span>общий</span>
+                    </div>
+                    <div class="channel" data-channel="chat">
+                        <i class="fas fa-hashtag"></i>
+                        <span>чат</span>
+                    </div>
+                    <div class="channel" data-channel="memes">
+                        <i class="fas fa-hashtag"></i>
+                        <span>мемы</span>
+                    </div>
+                </div>
+                
+                <div class="channel-category">
+                    <div class="category-header">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>ГОЛОСОВЫЕ КАНАЛЫ</span>
+                    </div>
+                    <div class="channel voice-channel">
+                        <i class="fas fa-volume-up"></i>
+                        <span>Общий чат</span>
+                    </div>
+                    <div class="channel voice-channel">
+                        <i class="fas fa-volume-up"></i>
+                        <span>Игровой канал</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="user-panel">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User Avatar">
+                    </div>
+                    <div class="user-details">
+                        <div class="username">User#1234</div>
+                        <div class="user-status">Online</div>
+                    </div>
+                </div>
+                <div class="user-controls">
+                    <button class="control-btn"><i class="fas fa-microphone"></i></button>
+                    <button class="control-btn"><i class="fas fa-headphones"></i></button>
+                    <button class="control-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="channel-info">
+                    <i class="fas fa-hashtag"></i>
+                    <span>общий</span>
+                </div>
+                <div class="channel-topic">Общий канал для обсуждения</div>
+                <div class="header-controls">
+                    <button class="header-btn"><i class="fas fa-bell"></i></button>
+                    <button class="header-btn"><i class="fas fa-pin"></i></button>
+                    <button class="header-btn"><i class="fas fa-user-friends"></i></button>
+                    <div class="search-box">
+                        <input type="text" placeholder="Поиск">
+                    </div>
+                    <button class="header-btn"><i class="fas fa-inbox"></i></button>
+                    <button class="header-btn"><i class="fas fa-question-circle"></i></button>
+                </div>
+            </div>
+
+            <div class="messages-container">
+                <div class="welcome-message">
+                    <div class="welcome-icon">#</div>
+                    <div class="welcome-text">
+                        <h3>Добро пожаловать в канал #общий!</h3>
+                        <p>Это начало канала #общий.</p>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/1.png" alt="User Avatar">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Alex#5678</span>
+                            <span class="message-time">Сегодня в 12:30</span>
+                        </div>
+                        <div class="message-text">
+                            Привет всем! Как дела?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="User Avatar">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Maria#9012</span>
+                            <span class="message-time">Сегодня в 12:32</span>
+                        </div>
+                        <div class="message-text">
+                            Привет! Все отлично, работаю над новым проектом.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/3.png" alt="User Avatar">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">John#3456</span>
+                            <span class="message-time">Сегодня в 12:35</span>
+                        </div>
+                        <div class="message-text">
+                            Кто сегодня вечером в игру? 🎮
+                        </div>
+                    </div>
+                </div>
+
+                <div id="typing-indicator" class="typing-indicator hidden">
+                    <div class="typing-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/4.png" alt="User Avatar">
+                    </div>
+                    <div class="typing-content">
+                        <div class="typing-text">
+                            <span class="typing-user">User#7890</span> печатает...
+                        </div>
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <div class="input-controls">
+                        <button class="input-btn"><i class="fas fa-plus"></i></button>
+                        <button class="input-btn" id="file-upload"><i class="fas fa-file"></i></button>
+                        <button class="input-btn" id="media-upload"><i class="fas fa-image"></i></button>
+                        <button class="input-btn"><i class="fas fa-gift"></i></button>
+                        <button class="input-btn"><i class="fas fa-grin"></i></button>
+                    </div>
+                    <input type="text" id="message-input" placeholder="Написать сообщение в #общий">
+                    <div class="input-actions">
+                        <button class="action-btn"><i class="fas fa-at"></i></button>
+                        <button class="action-btn"><i class="fas fa-gift"></i></button>
+                        <button class="action-btn"><i class="fas fa-grin"></i></button>
+                        <button class="action-btn"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Sidebar -->
+        <div class="members-sidebar">
+            <div class="members-header">
+                <span>УЧАСТНИКИ — 5</span>
+            </div>
+            <div class="members-list">
+                <div class="member online">
+                    <div class="member-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User Avatar">
+                    </div>
+                    <div class="member-name">User#1234</div>
+                </div>
+                <div class="member online">
+                    <div class="member-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/1.png" alt="User Avatar">
+                    </div>
+                    <div class="member-name">Alex#5678</div>
+                </div>
+                <div class="member online">
+                    <div class="member-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="User Avatar">
+                    </div>
+                    <div class="member-name">Maria#9012</div>
+                </div>
+                <div class="member idle">
+                    <div class="member-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/3.png" alt="User Avatar">
+                    </div>
+                    <div class="member-name">John#3456</div>
+                </div>
+                <div class="member offline">
+                    <div class="member-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/4.png" alt="User Avatar">
+                    </div>
+                    <div class="member-name">Anna#7890</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="create-server-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Настройка своего сервера</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Дайте вашему новому серверу индивидуальность, добавив ему название и иконку.</p>
+                <div class="server-upload">
+                    <div class="upload-area">
+                        <i class="fas fa-camera"></i>
+                        <span>ЗАГРУЗИТЬ</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="server-name">НАЗВАНИЕ СЕРВЕРА</label>
+                    <input type="text" id="server-name" placeholder="Введите название сервера">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary">Назад</button>
+                <button class="btn-primary">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="user-switcher-modal" class="modal hidden">
+        <div class="modal-content user-modal">
+            <div class="modal-header">
+                <h3>Выберите пользователя</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-list">
+                    <div class="user-option" data-user="user1">
+                        <div class="user-avatar">
+                            <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User Avatar">
+                        </div>
+                        <div class="user-info">
+                            <div class="username">User#1234</div>
+                            <div class="user-status">Online</div>
+                        </div>
+                    </div>
+                    <div class="user-option" data-user="user2">
+                        <div class="user-avatar">
+                            <img src="https://cdn.discordapp.com/embed/avatars/1.png" alt="User Avatar">
+                        </div>
+                        <div class="user-info">
+                            <div class="username">Alex#5678</div>
+                            <div class="user-status">Online</div>
+                        </div>
+                    </div>
+                    <div class="user-option" data-user="user3">
+                        <div class="user-avatar">
+                            <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="User Avatar">
+                        </div>
+                        <div class="user-info">
+                            <div class="username">Maria#9012</div>
+                            <div class="user-status">Online</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+
+            <script>// Discord Simulator
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const loadingScreen = document.getElementById('loading-screen');
+    const discordApp = document.getElementById('discord-app');
+    const messageInput = document.getElementById('message-input');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const createServerModal = document.getElementById('create-server-modal');
+    const userSwitcherModal = document.getElementById('user-switcher-modal');
+    const fileUploadBtn = document.getElementById('file-upload');
+    const mediaUploadBtn = document.getElementById('media-upload');
+    
+    // Server and channel data
+    const servers = {
+        home: { name: 'Главная', channels: [] },
+        friends: { name: 'Друзья', channels: [] },
+        nitro: { name: 'Nitro', channels: [] },
+        server1: { name: 'Сервер 1', channels: ['general', 'chat', 'memes'] },
+        server2: { name: 'Сервер 2', channels: [] },
+        server3: { name: 'Сервер 3', channels: [] }
+    };
+    
+    const channels = {
+        general: { name: 'общий', topic: 'Общий канал для обсуждения' },
+        chat: { name: 'чат', topic: 'Свободное общение' },
+        memes: { name: 'мемы', topic: 'Делимся мемами' }
+    };
+    
+    const users = {
+        user1: { name: 'User#1234', avatar: 'https://cdn.discordapp.com/embed/avatars/0.png' },
+        user2: { name: 'Alex#5678', avatar: 'https://cdn.discordapp.com/embed/avatars/1.png' },
+        user3: { name: 'Maria#9012', avatar: 'https://cdn.discordapp.com/embed/avatars/2.png' }
+    };
+    
+    // Current state
+    let currentServer = 'server1';
+    let currentChannel = 'general';
+    let currentUser = 'user1';
+    let typingTimeout = null;
+    
+    // Initialize the app
+    function init() {
+        // Simulate Discord loading
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            discordApp.classList.remove('hidden');
+        }, 3000);
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Set initial channel
+        updateChannelInfo();
+    }
+    
+    // Set up all event listeners
+    function setupEventListeners() {
+        // Server switching
+        document.querySelectorAll('.server-item').forEach(server => {
+            server.addEventListener('click', function() {
+                if (this.classList.contains('add-server')) {
+                    openCreateServerModal();
+                    return;
+                }
+                
+                const serverId = this.getAttribute('data-server');
+                if (serverId && serverId !== currentServer) {
+                    switchServer(serverId);
+                }
+            });
+        });
+        
+        // Channel switching
+        document.querySelectorAll('.channel').forEach(channel => {
+            channel.addEventListener('click', function() {
+                if (this.classList.contains('voice-channel')) return;
+                
+                const channelId = this.getAttribute('data-channel');
+                if (channelId && channelId !== currentChannel) {
+                    switchChannel(channelId);
+                }
+            });
+        });
+        
+        // Message input events
+        messageInput.addEventListener('input', handleTyping);
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                sendMessage(this.value);
+                this.value = '';
+                hideTypingIndicator();
+            }
+        });
+        
+        // User switching
+        document.querySelectorAll('.member').forEach(member => {
+            member.addEventListener('click', function() {
+                const username = this.querySelector('.member-name').textContent;
+                openUserSwitcherModal();
+            });
+        });
+        
+        // Modal controls
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.modal').classList.add('hidden');
+            });
+        });
+        
+        // File and media upload
+        fileUploadBtn.addEventListener('click', function() {
+            alert('Функция загрузки файлов эмулируется. В реальном приложении здесь было бы окно выбора файлов.');
+        });
+        
+        mediaUploadBtn.addEventListener('click', function() {
+            alert('Функция загрузки медиа эмулируется. В реальном приложении здесь было бы окно выбора изображений.');
+        });
+        
+        // Create server button
+        document.querySelector('.add-server').addEventListener('click', openCreateServerModal);
+        
+        // User panel click to open switcher
+        document.querySelector('.user-info').addEventListener('click', openUserSwitcherModal);
+        
+        // User selection in switcher
+        document.querySelectorAll('.user-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const userId = this.getAttribute('data-user');
+                switchUser(userId);
+                userSwitcherModal.classList.add('hidden');
+            });
+        });
+        
+        // Create server form submission
+        document.querySelector('#create-server-modal .btn-primary').addEventListener('click', function() {
+            const serverName = document.getElementById('server-name').value;
+            if (serverName.trim()) {
+                createServer(serverName);
+                createServerModal.classList.add('hidden');
+            } else {
+                alert('Пожалуйста, введите название сервера');
+            }
+        });
+    }
+    
+    // Switch to a different server
+    function switchServer(serverId) {
+        // Update active server
+        document.querySelectorAll('.server-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`.server-item[data-server="${serverId}"]`).classList.add('active');
+        
+        currentServer = serverId;
+        
+        // Update server header
+        const serverHeader = document.querySelector('.server-header h3');
+        serverHeader.textContent = servers[serverId].name;
+        
+        // Update channels list (simplified for demo)
+        if (serverId === 'server1') {
+            document.querySelector('.channels-list').classList.remove('hidden');
+        } else {
+            // For other servers, we would update the channels list
+            // For this demo, we'll just show a message
+            document.querySelector('.channels-list').classList.add('hidden');
+        }
+        
+        // Switch to the first channel of the server
+        if (servers[serverId].channels.length > 0) {
+            switchChannel(servers[serverId].channels[0]);
+        }
+    }
+    
+    // Switch to a different channel
+    function switchChannel(channelId) {
+        // Update active channel
+        document.querySelectorAll('.channel').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`.channel[data-channel="${channelId}"]`).classList.add('active');
+        
+        currentChannel = channelId;
+        updateChannelInfo();
+    }
+    
+    // Update channel information in the header
+    function updateChannelInfo() {
+        const channelInfo = document.querySelector('.channel-info span');
+        const channelTopic = document.querySelector('.channel-topic');
+        
+        channelInfo.textContent = channels[currentChannel].name;
+        channelTopic.textContent = channels[currentChannel].topic;
+        
+        // Update message input placeholder
+        messageInput.placeholder = `Написать сообщение в #${channels[currentChannel].name}`;
+    }
+    
+    // Handle typing indicator
+    function handleTyping() {
+        // Show typing indicator
+        if (!typingIndicator.classList.contains('hidden')) return;
+        
+        typingIndicator.classList.remove('hidden');
+        const typingUser = document.querySelector('.typing-user');
+        typingUser.textContent = users[currentUser].name;
+        
+        // Scroll to bottom
+        const messagesContainer = document.querySelector('.messages-container');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Clear existing timeout
+        if (typingTimeout) {
+            clearTimeout(typingTimeout);
+        }
+        
+        // Hide typing indicator after 3 seconds of inactivity
+        typingTimeout = setTimeout(hideTypingIndicator, 3000);
+    }
+    
+    // Hide typing indicator
+    function hideTypingIndicator() {
+        typingIndicator.classList.add('hidden');
+        if (typingTimeout) {
+            clearTimeout(typingTimeout);
+            typingTimeout = null;
+        }
+    }
+    
+    // Send a message
+    function sendMessage(text) {
+        const messagesContainer = document.querySelector('.messages-container');
+        
+        // Create message element
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message';
+        
+        messageElement.innerHTML = `
+            <div class="message-avatar">
+                <img src="${users[currentUser].avatar}" alt="User Avatar">
+            </div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-author">${users[currentUser].name}</span>
+                    <span class="message-time">${getCurrentTime()}</span>
+                </div>
+                <div class="message-text">${escapeHtml(text)}</div>
+            </div>
+        `;
+        
+        // Add message to container
+        messagesContainer.appendChild(messageElement);
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Simulate responses in some cases
+        simulateResponses(text);
+    }
+    
+    // Simulate responses from other users
+    function simulateResponses(text) {
+        const responses = [
+            { user: 'user2', text: 'Интересное сообщение!' },
+            { user: 'user3', text: 'Согласен с тобой!' },
+            { user: 'user2', text: 'Хорошая мысль' }
+        ];
+        
+        // Randomly decide if we should respond (30% chance)
+        if (Math.random() < 0.3) {
+            const response = responses[Math.floor(Math.random() * responses.length)];
+            
+            setTimeout(() => {
+                const messagesContainer = document.querySelector('.messages-container');
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                
+                messageElement.innerHTML = `
+                    <div class="message-avatar">
+                        <img src="${users[response.user].avatar}" alt="User Avatar">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">${users[response.user].name}</span>
+                            <span class="message-time">${getCurrentTime()}</span>
+                        </div>
+                        <div class="message-text">${response.text}</div>
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000 + Math.random() * 2000);
+        }
+    }
+    
+    // Open create server modal
+    function openCreateServerModal() {
+        createServerModal.classList.remove('hidden');
+    }
+    
+    // Open user switcher modal
+    function openUserSwitcherModal() {
+        userSwitcherModal.classList.remove('hidden');
+    }
+    
+    // Switch to a different user
+    function switchUser(userId) {
+        currentUser = userId;
+        
+        // Update user panel
+        const userAvatar = document.querySelector('.user-panel .user-avatar img');
+        const username = document.querySelector('.user-panel .username');
+        
+        userAvatar.src = users[userId].avatar;
+        username.textContent = users[userId].name;
+        
+        // Update typing indicator
+        const typingUser = document.querySelector('.typing-user');
+        typingUser.textContent = users[userId].name;
+    }
+    
+    // Create a new server (simulated)
+    function createServer(name) {
+        // In a real app, this would make an API call
+        // For this demo, we'll just show an alert
+        alert(`Сервер "${name}" создан! (эмулируется)`);
+    }
+    
+    // Utility function to get current time in Discord format
+    function getCurrentTime() {
+        const now = new Date();
+        return `Сегодня в ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+    }
+    
+    // Utility function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Initialize the application
+    init();
+});</script>
+        
+    
+</body>
